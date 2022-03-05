@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "yarn run build && yarn run start",
     "deploy": "yarn run build && node dist/deployCommands.js",
-    "start": "node .",
+    "start": "UPDATE_CHAMPION_IDS=true node .",
     "build": "tsc",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
