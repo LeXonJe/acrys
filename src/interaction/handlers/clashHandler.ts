@@ -4,20 +4,20 @@ import { ChampionMasteryDTO, MatchDto, MatchV5DTOs, SummonerLeagueDto, SummonerV
 import { LolUtils } from "../../lol/utils";
 import { Handler } from "../handler";
 
-export const inspectHandler: Handler = {
-  name: "inspect",
-  description: "Analysiert einen League Spieler.",
+export const clashHandler: Handler = {
+  name: "clash",
+  description: "Analysiert ein Clash Team.",
   options: [
     {
       type: ApplicationCommandOptionTypes.STRING.valueOf(),
-      name: "name",
-      description: "Der Name des Spielers",
+      name: "member",
+      description: "Der Name eines Teammitgliedes.",
       required: true,
     },
     {
       type: ApplicationCommandOptionTypes.INTEGER.valueOf(),
       name: "depth",
-      description: "Die Anzahl an Matches, die abgerufen werden",
+      description: "Die Anzahl an Matches, die abgerufen werden pro Teammitglied",
       required: false,
     },
   ],
@@ -43,7 +43,7 @@ export const inspectHandler: Handler = {
       return;
     }
 
-    const matchCount = interaction.options.getInteger("depth") || 10;
+    const matchCount = interaction.options.getInteger("depth") || 5;
 
     const mastery = await lolUtils.getMasteryPoints(profile.summoner.id);
     const matches = await lolUtils.getMostUsedChampions(profile.summoner.puuid, matchCount);
@@ -88,8 +88,6 @@ export const inspectHandler: Handler = {
 
         for (let i = 0; i < idsSorted.length && i < 10; i++) {
           const champion = mostUsedChamps[idsSorted[i]];
-          //console.log(`${champion.champName} = ${champion.won} wins + ${champion.used} used = ${(champion.won / champion.used) * 100}% `);
-          //| ${((champion.won / champion.used) * 100).toFixed(2)}% Won
           matchString += `${i + 1}. ${champion.champName} (${((champion.used / matchesCompared) * 100).toFixed(2)}%)\n`;
         }
 

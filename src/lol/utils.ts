@@ -10,6 +10,7 @@ interface ChampionMasteryExtended extends ChampionMasteryDTO {
 interface UsedChampion {
   champId: number;
   champName: string;
+  won: number;
   used: number;
 }
 
@@ -34,6 +35,18 @@ export class LolUtils {
 
   async predictPicks(puuid: string, mastery: ChampionMasteryExtended[], count: number = 5) {}
 
+  async getClashTeam(summonerName: string) {
+    const summonerOrigin = (await this.lolApi.Summoner.getByName(summonerName, this.region)).response;
+
+    const teamId = (await this.lolApi.Clash.playersList(summonerOrigin.id, this.region)).response[0].teamId;
+
+    if (!teamId) {
+      throw new Error("TeamId not found");
+    }
+
+    const team = (await this.lolApi.Clash.getTeamById(teamId, this.region)).response;
+  }
+
   getMostUsedChampions(puuid: string, depth: number) {
     const mostUsedChamps: MostUsedChampions = {};
 
@@ -44,14 +57,20 @@ export class LolUtils {
             for (let i = 0; i < match.info.participants.length; i++) {
               const participant = match.info.participants[i];
 
+              const failed = participant.nexusLost || participant.gameEndedInEarlySurrender || participant.gameEndedInSurrender;
+
               if (participant.puuid === puuid) {
                 if (!mostUsedChamps[participant.championId]) {
                   mostUsedChamps[participant.championId] = {
                     champId: participant.championId,
                     champName: participant.championName,
+                    won: failed ? 0 : 1,
                     used: 1,
                   };
                 } else {
+                  if (!failed) {
+                    mostUsedChamps[participant.championId].won++;
+                  }
                   mostUsedChamps[participant.championId].used++;
                 }
 

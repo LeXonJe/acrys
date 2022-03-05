@@ -3,6 +3,7 @@ import { REST } from "@discordjs/rest";
 import { Routes, RESTPostAPIApplicationCommandsJSONBody } from "discord-api-types/v9";
 import { config as env } from "dotenv";
 import { Handler } from "./interaction/handler";
+import { clashHandler } from "./interaction/handlers/clashHandler";
 import { inspectHandler } from "./interaction/handlers/inspectHandler";
 
 env();
@@ -24,7 +25,7 @@ function formatHandler(handler: Handler): RESTPostAPIApplicationCommandsJSONBody
   };
 }
 
-const commands: RESTPostAPIApplicationCommandsJSONBody[] = [formatHandler(inspectHandler)];
+const commands: RESTPostAPIApplicationCommandsJSONBody[] = [formatHandler(inspectHandler), formatHandler(clashHandler)];
 
 const rest = new REST({ version: "9" }).setToken(token);
 
